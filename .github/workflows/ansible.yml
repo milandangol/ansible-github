@@ -30,10 +30,10 @@ jobs:
 
       - name: Add sshkey from github secrets
         run: echo "${{ secrets.AWS_KEY }}" > aws.key
-        
+
       - name: Read key 
         run: cat aws.key
 
       - name: Run Ansible
         run: | 
-            ansible-playbook -i hosts.ini node.yml -e "ec2_ip=${{ github.event.inputs.ec2_ip }}"
+            ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts.ini node.yml -e "ec2_ip=${{ github.event.inputs.ec2_ip }}"
