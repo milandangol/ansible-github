@@ -1,0 +1,39 @@
+name: Deploy Ansible
+
+on:
+#   push:
+#     branches:
+#       - main
+    workflow_dispatch:
+        inputs:
+            ec2_ip:
+                description: "Enter the ec2 Public IP"
+                required:  true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Ansible
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible
+
+      - name: Add sshkey from github secrets
+        run: echo "${{ secrets.AWS_KEY }}" > aws.key
+        
+      - name: Read key 
+        run: cat aws.key
+
+      - name: Run Ansible
+        run: | 
+            ansible-playbook -i hosts.ini node.yml -e "ec2_ip=${{ github.event.inputs.ec2_ip }}"
